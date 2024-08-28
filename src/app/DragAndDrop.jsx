@@ -1,20 +1,21 @@
-// components/DragAndDrop.js
 import React, { useState, useEffect, useMemo } from 'react';
-import { mockAdData } from '../data/mockData';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
-import Card from '../components/Card';
+
+import { mockAdData } from './data/mockData';
+import Card from './components/Card';
 
 // Register the necessary components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
 
 export default function DragAndDrop() {
     const [reportData, setReportData] = useState([]);
-    const [selectedMetric, setSelectedMetric] = useState('Impressions');
     const [chartType, setChartType] = useState('bar');
     const [filteredData, setFilteredData] = useState(mockAdData.campaigns);
     const [filters, setFilters] = useState({ campaignName: '', deviceType: '' });
     const [availableMetrics, setAvailableMetrics] = useState(['Impressions', 'Clicks', 'Conversions', 'Cost', 'CTR', 'CPA']);
+
+    const selectedMetric = 'Impressions';
 
     useEffect(() => {
         const { campaignName, deviceType } = filters;
@@ -32,7 +33,7 @@ export default function DragAndDrop() {
         const data = e.dataTransfer.getData('text/plain');
         if (!reportData.includes(data)) {
             setReportData((prev) => [...prev, data]);
-            setAvailableMetrics((prev) => prev.filter(metric => metric !== data)); // Remove from available metrics
+            setAvailableMetrics((prev) => prev.filter(metric => metric !== data));
         }
     };
 
@@ -45,7 +46,7 @@ export default function DragAndDrop() {
 
     const handleCancelDropdownOption = (title) => {
         setReportData((prev) => prev.filter(elem => elem !== title));
-        setAvailableMetrics((prev) => [...prev, title]); // Add back to available metrics
+        setAvailableMetrics((prev) => [...prev, title]);
     };
 
     const chartData = useMemo(() => ({
@@ -53,7 +54,7 @@ export default function DragAndDrop() {
         datasets: [{
             label: selectedMetric,
             data: filteredData.map(campaign => campaign[selectedMetric.toLowerCase()]),
-            backgroundColor: 'rgba(100, 149, 237, 0.6)', // Soothing cornflower blue
+            backgroundColor: 'rgba(100, 149, 237, 0.6)',
         }],
     }), [filteredData, selectedMetric]);
 
