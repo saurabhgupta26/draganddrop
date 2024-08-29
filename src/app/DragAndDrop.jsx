@@ -233,8 +233,7 @@ export default function DragAndDrop() {
             <div className="mb-4 flex items-center">
                 <button
                     onClick={handleComparisonModeToggle}
-                    className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition mr-4 ${comparisonMode ? "bg-red-500 hover:bg-red-600" : ""
-                        }`}
+                    className={` text-white py-2 px-4 rounded  transition mr-4 ${comparisonMode ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
                 >
                     {comparisonMode ? "Disable" : "Enable"} Comparison Mode
                 </button>
