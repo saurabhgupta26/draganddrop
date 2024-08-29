@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.7.5",
     "chart.js": "^4.4.4",
+    "chartjs-to-image": "^1.2.2",
     "next": "14.2.6",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",

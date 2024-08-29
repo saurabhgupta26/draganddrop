@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
+import Image from 'next/image';
 
-import { mockAdData } from './data/mockData';
+
 import Card from './components/Card';
+import { mockAdData } from './data/mockData';
 
-// Register the necessary components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
 
 export default function DragAndDrop() {
@@ -14,17 +15,68 @@ export default function DragAndDrop() {
     const [filteredData, setFilteredData] = useState(mockAdData.campaigns);
     const [filters, setFilters] = useState({ campaignName: '', deviceType: '' });
     const [availableMetrics, setAvailableMetrics] = useState(['Impressions', 'Clicks', 'Conversions', 'Cost', 'CTR', 'CPA']);
+    const [chartData, setChartData] = useState(null);
+    const [pieChartData, setPieChartData] = useState(null);
 
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+
+    const [comparisonMode, setComparisonMode] = useState(false);
+    const [comparisonData, setComparisonData] = useState([]);
     const selectedMetric = 'Impressions';
 
     useEffect(() => {
         const { campaignName, deviceType } = filters;
-        const filtered = mockAdData.campaigns.filter((campaign) =>
-            (!campaignName || campaign.name.includes(campaignName)) &&
-            (!deviceType || campaign.deviceType === deviceType)
-        );
+        const filtered = mockAdData.campaigns.filter((campaign) => {
+            const withinDateRange = (!startDate || new Date(campaign.date) >= new Date(startDate)) &&
+                (!endDate || new Date(campaign.date) <= new Date(endDate));
+            return (
+                withinDateRange &&
+                (!campaignName || campaign.name.includes(campaignName)) &&
+                (!deviceType || campaign.deviceType === deviceType)
+            );
+        });
         setFilteredData(filtered);
-    }, [filters]);
+    }, [filters, startDate, endDate]);
+
+    const updateChartData = () => {
+        const data = filteredData.map(campaign => campaign[selectedMetric.toLowerCase()]);
+        setChartData({
+            labels: filteredData.map(campaign => campaign.name),
+            datasets: [
+                {
+                    label: selectedMetric,
+                    data: data,
+                    backgroundColor: 'rgba(100, 149, 237, 0.6)',
+                }],
+        });
+    };
+
+    const updatePieChartData = () => {
+        const data = reportData.map(metric =>
+            filteredData.reduce((acc, campaign) => acc + campaign[metric.toLowerCase()], 0)
+        );
+        setPieChartData({
+            labels: reportData,
+            datasets: [{
+                label: 'Campaign Metrics',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                ],
+            }],
+        });
+    };
+
+    useEffect(() => {
+        updateChartData();
+        updatePieChartData();
+    }, [filteredData, reportData, comparisonMode, comparisonData]);
 
     const handleDragOver = (e) => e.preventDefault();
 
@@ -43,48 +95,25 @@ export default function DragAndDrop() {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleCancelDropdownOption = (title) => {
         setReportData((prev) => prev.filter(elem => elem !== title));
         setAvailableMetrics((prev) => [...prev, title]);
     };
 
-    const chartData = useMemo(() => ({
-        labels: filteredData.map(campaign => campaign.name),
-        datasets: [{
-            label: selectedMetric,
-            data: filteredData.map(campaign => campaign[selectedMetric.toLowerCase()]),
-            backgroundColor: 'rgba(100, 149, 237, 0.6)',
-        }],
-    }), [filteredData, selectedMetric]);
+    const exportToPDF = () => {
 
-    const pieChartData = useMemo(() => ({
-        labels: reportData,
-        datasets: [{
-            label: 'Campaign Metrics',
-            data: reportData.map(metric =>
-                filteredData.reduce((acc, campaign) => acc + campaign[metric.toLowerCase()], 0)
-            ),
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.6)',
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(255, 206, 86, 0.6)',
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(153, 102, 255, 0.6)',
-                'rgba(255, 159, 64, 0.6)',
-            ],
-        }],
-    }), [reportData, filteredData]);
-
-    const pieChartOptions = {
-        plugins: {
-            legend: {
-                display: true,
-                position: 'right',
-            },
-        },
+    };
+    const handleComparisonModeToggle = () => {
+        setComparisonMode(prev => !prev);
     };
 
+    const handleComparisonDataAdd = () => {
+        setComparisonData(prev => [...prev, filteredData]);
+    };
+
+    const handleComparisonDataRemove = (index) => {
+        setComparisonData(prev => prev.filter((_, i) => i !== index));
+    };
     let ChartComponent = chartType === 'bar' ? Bar : Line;
 
     return (
@@ -115,6 +144,45 @@ export default function DragAndDrop() {
                 />
             </div>
 
+            <div className="mb-4 flex items-center">
+                <label className="mr-2 text-gray-700">Start Date:</label>
+                <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border p-2 mx-2 rounded"
+                />
+                <label className="mr-2 text-gray-700">End Date:</label>
+                <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border p-2 mx-2 rounded"
+                />
+            </div>
+            <div className="mb-4 flex items-center">
+                <button onClick={handleComparisonModeToggle} className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition mr-4 ${comparisonMode ? 'bg-red-500 hover:bg-red-600' : ''}`}>
+                    {comparisonMode ? 'Disable' : 'Enable'} Comparison Mode
+                </button>
+                {comparisonMode && (
+                    <button onClick={handleComparisonDataAdd} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">
+                        Add Comparison Data
+                    </button>
+                )}
+            </div>
+
+            {comparisonMode && (
+                <div className="mb-4">
+                    {comparisonData.map((_, index) => (
+                        <div key={index} className="bg-gray-200 p-4 rounded mb-2">
+                            <p className="font-bold">Comparison {index + 1}</p>
+                            <button onClick={() => handleComparisonDataRemove(index)} className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition float-right">
+                                Remove
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
             <div className="flex">
                 <div
                     className="border-2 border-dashed border-blue-300 p-4 rounded-md mb-4 flex-1"
@@ -139,7 +207,16 @@ export default function DragAndDrop() {
                                 draggable
                                 onDragStart={(e) => e.dataTransfer.setData('text/plain', metric)}
                             >
-                                {metric}
+                                <div className="flex items-center">
+                                    <Image
+                                        src="/adsense.png"
+                                        alt='image-adsense'
+                                        className="w-4 h-4 object-cover rounded-md mr-4 bg-transparent"
+                                        width={4}
+                                        height={4}
+                                        priority
+                                    /> {metric}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -148,11 +225,17 @@ export default function DragAndDrop() {
 
             <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="mt-4">
-                    <ChartComponent data={chartData} />
+                    {chartData && <ChartComponent data={chartData} />}
                 </div>
                 <div style={{ height: '500px' }} className='mx-auto'>
-                    <Pie data={pieChartData} options={pieChartOptions} />
+                    {pieChartData && <Pie data={pieChartData} options={{ plugins: { legend: { display: true, position: 'right' } } }} />}
                 </div>
+            </div>
+
+            <div className="mt-4">
+                <button onClick={exportToPDF} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+                    Export to PDF
+                </button>
             </div>
         </div>
     );

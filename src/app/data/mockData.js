@@ -10,6 +10,7 @@ export const mockAdData = {
       ctr: 5,
       cpa: 4,
       deviceType: 'Mobile',
+      date: '2024-03-03',
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ export const mockAdData = {
       ctr: 5,
       cpa: 4,
       deviceType: 'Desktop',
+      date: '2024-03-05',
     },
     {
       id: 3,
@@ -32,6 +34,7 @@ export const mockAdData = {
       ctr: 6,
       cpa: 4.17,
       deviceType: 'Mobile',
+      date: '2024-03-10',
     },
     {
       id: 4,
@@ -43,6 +46,7 @@ export const mockAdData = {
       ctr: 6,
       cpa: 4,
       deviceType: 'Desktop',
+      date: '2024-03-15',
     },
     {
       id: 5,
@@ -54,6 +58,7 @@ export const mockAdData = {
       ctr: 6,
       cpa: 3.89,
       deviceType: 'Mobile',
+      date: '2024-03-20',
     },
     {
       id: 6,
@@ -65,6 +70,7 @@ export const mockAdData = {
       ctr: 5.71,
       cpa: 4,
       deviceType: 'Desktop',
+      date: '2024-03-25',
     },
     {
       id: 7,
@@ -76,6 +82,7 @@ export const mockAdData = {
       ctr: 5.5,
       cpa: 4.09,
       deviceType: 'Mobile',
+      date: '2024-02-03',
     },
     {
       id: 8,
@@ -87,6 +94,7 @@ export const mockAdData = {
       ctr: 5.56,
       cpa: 4,
       deviceType: 'Desktop',
+      date: '2024-02-05',
     },
     {
       id: 9,
@@ -98,6 +106,7 @@ export const mockAdData = {
       ctr: 6,
       cpa: 3.67,
       deviceType: 'Mobile',
+      date: '2024-02-10',
     },
     {
       id: 10,
@@ -109,6 +118,7 @@ export const mockAdData = {
       ctr: 5.82,
       cpa: 3.75,
       deviceType: 'Desktop',
+      date: '2024-02-15',
     },
     {
       id: 11,
@@ -120,6 +130,7 @@ export const mockAdData = {
       ctr: 5.83,
       cpa: 3.71,
       deviceType: 'Mobile',
+      date: '2024-02-20',
     },
     {
       id: 12,
@@ -131,6 +142,7 @@ export const mockAdData = {
       ctr: 5.69,
       cpa: 3.78,
       deviceType: 'Desktop',
+      date: '2024-02-25',
     },
     {
       id: 13,
@@ -142,6 +154,7 @@ export const mockAdData = {
       ctr: 5.71,
       cpa: 3.75,
       deviceType: 'Mobile',
+      date: '2024-03-03',
     },
     {
       id: 14,
@@ -153,6 +166,7 @@ export const mockAdData = {
       ctr: 5.6,
       cpa: 3.81,
       deviceType: 'Desktop',
+      date: '2024-03-05',
     },
     {
       id: 15,
@@ -164,6 +178,7 @@ export const mockAdData = {
       ctr: 5.63,
       cpa: 3.78,
       deviceType: 'Mobile',
+      date: '2024-03-10',
     },
   ],
 };
