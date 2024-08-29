@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
-
 import Card from './components/Card';
 import { mockAdData } from './data/mockData';
 
@@ -16,24 +15,20 @@ export default function DragAndDrop() {
     const [availableMetrics, setAvailableMetrics] = useState(['Impressions', 'Clicks', 'Conversions', 'Cost', 'CTR', 'CPA']);
     const [chartData, setChartData] = useState(null);
     const [pieChartData, setPieChartData] = useState(null);
-
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-
     const [comparisonMode, setComparisonMode] = useState(false);
     const [comparisonData, setComparisonData] = useState([]);
     const selectedMetric = 'Impressions';
 
     useEffect(() => {
         const { campaignName, deviceType } = filters;
-        const filtered = mockAdData.campaigns.filter((campaign) => {
+        const filtered = mockAdData.campaigns.filter(campaign => {
             const withinDateRange = (!startDate || new Date(campaign.date) >= new Date(startDate)) &&
                 (!endDate || new Date(campaign.date) <= new Date(endDate));
-            return (
-                withinDateRange &&
+            return withinDateRange &&
                 (!campaignName || campaign.name.includes(campaignName)) &&
-                (!deviceType || campaign.deviceType === deviceType)
-            );
+                (!deviceType || campaign.deviceType === deviceType);
         });
         setFilteredData(filtered);
     }, [filters, startDate, endDate]);
@@ -48,13 +43,11 @@ export default function DragAndDrop() {
                     data: data,
                     backgroundColor: 'rgba(100, 149, 237, 0.6)',
                 },
-                ...(comparisonMode
-                    ? comparisonData.map((campaign, index) => ({
-                        label: `Comparison ${index + 1}`,
-                        data: campaign.map(c => c[selectedMetric.toLowerCase()]),
-                        backgroundColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`,
-                    }))
-                    : []),
+                ...(comparisonMode ? comparisonData.map((campaign, index) => ({
+                    label: `Comparison ${index + 1}`,
+                    data: campaign.map(c => c[selectedMetric.toLowerCase()]),
+                    backgroundColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`,
+                })) : []),
             ],
         });
     };
@@ -91,34 +84,30 @@ export default function DragAndDrop() {
         e.preventDefault();
         const data = e.dataTransfer.getData('text/plain');
         if (!reportData.includes(data)) {
-            setReportData((prev) => [...prev, data]);
-            setAvailableMetrics((prev) => prev.filter(metric => metric !== data));
+            setReportData(prev => [...prev, data]);
+            setAvailableMetrics(prev => prev.filter(metric => metric !== data));
         }
     };
 
-    const handleChartTypeChange = (e) => setChartType(e.target.value);
-
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters((prev) => ({ ...prev, [name]: value }));
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
+
     const handleCancelDropdownOption = (title) => {
-        setReportData((prev) => prev.filter(elem => elem !== title));
-        setAvailableMetrics((prev) => [...prev, title]);
+        setReportData(prev => prev.filter(elem => elem !== title));
+        setAvailableMetrics(prev => [...prev, title]);
     };
 
-    const handleComparisonModeToggle = () => {
-        setComparisonMode(prev => !prev);
-    };
+    const handleComparisonModeToggle = () => setComparisonMode(prev => !prev);
 
-    const handleComparisonDataAdd = () => {
-        setComparisonData(prev => [...prev, filteredData]);
-    };
+    const handleComparisonDataAdd = () => setComparisonData(prev => [...prev, filteredData]);
 
     const handleComparisonDataRemove = (index) => {
         setComparisonData(prev => prev.filter((_, idx) => idx !== index));
     };
-    let ChartComponent = chartType === 'bar' ? Bar : Line;
+
+    const ChartComponent = chartType === 'bar' ? Bar : Line;
 
     return (
         <div className="container mx-auto my-8">
@@ -126,7 +115,7 @@ export default function DragAndDrop() {
 
             <div className="mb-4 flex items-center">
                 <label className="mr-2 text-gray-700">Select Chart Type:</label>
-                <select value={chartType} onChange={handleChartTypeChange} className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="bar">Bar Chart</option>
                     <option value="line">Line Chart</option>
                 </select>
@@ -164,6 +153,7 @@ export default function DragAndDrop() {
                     className="border p-2 mx-2 rounded"
                 />
             </div>
+
             <div className="mb-4 flex items-center">
                 <button onClick={handleComparisonModeToggle} className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition mr-4 ${comparisonMode ? 'bg-red-500 hover:bg-red-600' : ''}`}>
                     {comparisonMode ? 'Disable' : 'Enable'} Comparison Mode
@@ -189,6 +179,7 @@ export default function DragAndDrop() {
                     ))}
                 </div>
             )}
+
             <div className="flex">
                 <div
                     className="border-2 border-dashed border-blue-300 p-4 rounded-md mb-4 flex-1"
