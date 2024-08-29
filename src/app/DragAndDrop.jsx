@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
-import Image from 'next/image';
-
 
 import Card from './components/Card';
 import { mockAdData } from './data/mockData';
@@ -48,7 +47,15 @@ export default function DragAndDrop() {
                     label: selectedMetric,
                     data: data,
                     backgroundColor: 'rgba(100, 149, 237, 0.6)',
-                }],
+                },
+                ...(comparisonMode
+                    ? comparisonData.map((campaign, index) => ({
+                        label: `Comparison ${index + 1}`,
+                        data: campaign.map(c => c[selectedMetric.toLowerCase()]),
+                        backgroundColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`,
+                    }))
+                    : []),
+            ],
         });
     };
 
@@ -100,9 +107,6 @@ export default function DragAndDrop() {
         setAvailableMetrics((prev) => [...prev, title]);
     };
 
-    const exportToPDF = () => {
-
-    };
     const handleComparisonModeToggle = () => {
         setComparisonMode(prev => !prev);
     };
@@ -112,7 +116,7 @@ export default function DragAndDrop() {
     };
 
     const handleComparisonDataRemove = (index) => {
-        setComparisonData(prev => prev.filter((_, i) => i !== index));
+        setComparisonData(prev => prev.filter((_, idx) => idx !== index));
     };
     let ChartComponent = chartType === 'bar' ? Bar : Line;
 
@@ -172,12 +176,14 @@ export default function DragAndDrop() {
             </div>
 
             {comparisonMode && (
-                <div className="mb-4">
+                <div className="mb-4 flex item-center flex-wrap">
                     {comparisonData.map((_, index) => (
-                        <div key={index} className="bg-gray-200 p-4 rounded mb-2">
+                        <div key={index} className="bg-gray-200 p-4 rounded mb-2 flex item-center">
                             <p className="font-bold">Comparison {index + 1}</p>
-                            <button onClick={() => handleComparisonDataRemove(index)} className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition float-right">
-                                Remove
+                            <button onClick={() => handleComparisonDataRemove(index)} className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition float-right mx-2">
+                                <svg className="w-3 h-3 rounded-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </button>
                         </div>
                     ))}
@@ -230,12 +236,6 @@ export default function DragAndDrop() {
                 <div style={{ height: '500px' }} className='mx-auto'>
                     {pieChartData && <Pie data={pieChartData} options={{ plugins: { legend: { display: true, position: 'right' } } }} />}
                 </div>
-            </div>
-
-            <div className="mt-4">
-                <button onClick={exportToPDF} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
-                    Export to PDF
-                </button>
             </div>
         </div>
     );

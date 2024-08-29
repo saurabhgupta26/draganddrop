@@ -11,7 +11,7 @@ export default function Navbar() {
                         alt="Zocket Logo"
                         className="dark:invert"
                         width={100}
-                        height={24}
+                        height={0}
                         priority
                     />
                 </a>

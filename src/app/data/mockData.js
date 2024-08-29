@@ -3,7 +3,7 @@ export const mockAdData = {
     {
       id: 1,
       name: 'Campaign A',
-      impressions: 13000,
+      impressions: 63000,
       clicks: 500,
       conversions: 50,
       cost: 200,
@@ -111,7 +111,7 @@ export const mockAdData = {
     {
       id: 10,
       name: 'Campaign J',
-      impressions: 75000,
+      impressions: 35000,
       clicks: 3200,
       conversions: 320,
       cost: 1200,
