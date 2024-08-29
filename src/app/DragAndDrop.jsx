@@ -37,10 +37,10 @@ export default function DragAndDrop() {
     const [filteredData, setFilteredData] = useState(mockAdData.campaigns);
     const [filters, setFilters] = useState({ campaignName: "", deviceType: "" });
     const [availableMetrics, setAvailableMetrics] = useState([
-        "Impressions",
         "Clicks",
         "Conversions",
         "Cost",
+        "Impressions",
         "CTR",
         "CPA",
     ]);
@@ -148,10 +148,10 @@ export default function DragAndDrop() {
 
     const handleComparisonModeToggle = () => setComparisonMode((prev) => !prev);
 
-    const handleComparisonDataAdd = () =>
+    const handleComparisonChartAdd = () =>
         setComparisonData((prev) => [...prev, filteredData]);
 
-    const handleComparisonDataRemove = (index) => {
+    const handleComparisonChartRemove = (index) => {
         setComparisonData((prev) => prev.filter((_, idx) => idx !== index));
     };
 
@@ -181,55 +181,117 @@ export default function DragAndDrop() {
                 Ad Campaign Report Builder
             </h1>
 
-            <div className="mb-4 flex items-center">
-                <label className="mr-2 text-gray-700">Select Chart Type:</label>
-                <select
-                    value={chartType}
-                    onChange={(e) => setChartType(e.target.value)}
-                    className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+            <div className="flex">
+                <div
+                    className="border-2 border-dashed border-blue-300 p-2 rounded-md mb-4 flex-1"
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                 >
-                    <option value="bar">Bar Chart</option>
-                    <option value="line">Line Chart</option>
-                </select>
+                    <p className="text-gray-700">Drag and drop available metrics here</p>
+                    {reportData.map((elem, idx) => (
+                        <div
+                            key={idx}
+                            className="bg-blue-100 p-2 rounded-md m-2 inline-block"
+                        >
+                            <Card
+                                title={elem}
+                                qty={idx}
+                                handleCancelDropdownOption={handleCancelDropdownOption}
+                            />
+                        </div>
+                    ))}
+                </div>
+                <div className="flex justify-around">
+                    <div className="flex flex-col ml-4 h-60">
+                        <h2 className="text-xl font-semibold mb-2 text-gray-800">
+                            Available Metrics
+                        </h2>
+                        <div className="grid grid-cols-1 gap-2 overflow-scroll">
+                            {availableMetrics.map((metric) => (
+                                <div
+                                    key={metric}
+                                    className="bg-blue-100 p-4 rounded-md cursor-grab hover:bg-blue-200 transition"
+                                    draggable
+                                    onDragStart={(e) =>
+                                        e.dataTransfer.setData("text/plain", metric)
+                                    }
+                                >
+                                    <div className="flex items-center">
+                                        <Image
+                                            src="/adsense.png"
+                                            alt="image-adsense"
+                                            className="w-4 h-4 object-cover rounded-md mr-4 bg-transparent"
+                                            width={4}
+                                            height={4}
+                                            priority
+                                        />{metric}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ height: "300px" }} className="mx-auto">
+                        {pieChartData && (
+                            <Pie
+                                data={pieChartData}
+                                options={{
+                                    plugins: { legend: { display: true, position: "bottom" } },
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
 
-            <div className="mb-4 flex items-center">
-                <label className="mr-2 text-gray-700">Filter by Device Types:</label>
-                <select
-                    name="deviceType"
-                    onChange={handleFilterChange}
-                    className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-                >
-                    <option value="">All Device Types</option>
-                    <option value="Mobile">Mobile</option>
-                    <option value="Desktop">Desktop</option>
-                </select>
-                <input
-                    type="text"
-                    name="campaignName"
-                    placeholder="Filter by Campaign Name"
-                    onChange={handleFilterChange}
-                    className="border p-2 mx-2 w-60 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-            </div>
+            <div className="flex items-center flex-wrap">
+                <div className="mb-4 flex items-center">
+                    <label className="mr-2 text-gray-700">Select Chart Type:</label>
+                    <select
+                        value={chartType}
+                        onChange={(e) => setChartType(e.target.value)}
+                        className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    >
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                    </select>
+                </div>
+                <div className="mb-4 flex items-center">
+                    <label className="mr-2 text-gray-700">Filter by Device Types:</label>
+                    <select
+                        name="deviceType"
+                        onChange={handleFilterChange}
+                        className="border p-2 mx-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    >
+                        <option value="">All Device Types</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Desktop">Desktop</option>
+                    </select>
+                    <input
+                        type="text"
+                        name="campaignName"
+                        placeholder="Filter by Campaign Name"
+                        onChange={handleFilterChange}
+                        className="border p-2 mx-2 w-60 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                </div>
 
-            <div className="mb-4 flex items-center">
-                <label className="mr-2 text-gray-700">Start Date:</label>
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="border p-2 mx-2 rounded"
-                />
-                <label className="mr-2 text-gray-700">End Date:</label>
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="border p-2 mx-2 rounded"
-                />
+                <div className="mb-4 flex items-center">
+                    <label className="mr-2 text-gray-700">Start Date:</label>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="border p-2 mx-2 rounded"
+                    />
+                    <label className="mr-2 text-gray-700">End Date:</label>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="border p-2 mx-2 rounded"
+                    />
+                </div>
             </div>
-
             <div className="mb-4 flex items-center">
                 <button
                     onClick={handleComparisonModeToggle}
@@ -239,14 +301,13 @@ export default function DragAndDrop() {
                 </button>
                 {comparisonMode && (
                     <button
-                        onClick={handleComparisonDataAdd}
+                        onClick={handleComparisonChartAdd}
                         className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
                     >
                         Add Comparison Data
                     </button>
                 )}
             </div>
-
             {comparisonMode && (
                 <div className="mb-4 flex item-center flex-wrap">
                     {comparisonData.map((_, index) => (
@@ -256,7 +317,7 @@ export default function DragAndDrop() {
                         >
                             <p className="font-bold">Comparison {index + 1}</p>
                             <button
-                                onClick={() => handleComparisonDataRemove(index)}
+                                onClick={() => handleComparisonChartRemove(index)}
                                 className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition float-right mx-2"
                             >
                                 <svg
@@ -280,71 +341,10 @@ export default function DragAndDrop() {
                 </div>
             )}
 
-            <div className="flex">
-                <div
-                    className="border-2 border-dashed border-blue-300 p-4 rounded-md mb-4 flex-1"
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                >
-                    <p className="text-gray-700">Drag and drop available metrics here</p>
-                    {reportData.map((elem, idx) => (
-                        <div
-                            key={idx}
-                            className="bg-blue-100 p-2 rounded-md m-2 inline-block"
-                        >
-                            <Card
-                                title={elem}
-                                qty={idx}
-                                handleCancelDropdownOption={handleCancelDropdownOption}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                <div className="flex flex-col ml-4">
-                    <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                        Available Metrics
-                    </h2>
-                    <div className="grid grid-cols-1 gap-2">
-                        {availableMetrics.map((metric) => (
-                            <div
-                                key={metric}
-                                className="bg-blue-100 p-4 rounded-md cursor-grab hover:bg-blue-200 transition"
-                                draggable
-                                onDragStart={(e) =>
-                                    e.dataTransfer.setData("text/plain", metric)
-                                }
-                            >
-                                <div className="flex items-center">
-                                    <Image
-                                        src="/adsense.png"
-                                        alt="image-adsense"
-                                        className="w-4 h-4 object-cover rounded-md mr-4 bg-transparent"
-                                        width={4}
-                                        height={4}
-                                        priority
-                                    />{" "}
-                                    {metric}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
             <div id="report-container">
                 <div className="mt-1 grid grid-cols-2 gap-2">
                     <div className="mt-2">
                         {chartData && <ChartComponent data={chartData} />}
-                    </div>
-                    <div style={{ height: "300px" }} className="mx-auto">
-                        {pieChartData && (
-                            <Pie
-                                data={pieChartData}
-                                options={{
-                                    plugins: { legend: { display: true, position: "right" } },
-                                }}
-                            />
-                        )}
                     </div>
                 </div>
             </div>
